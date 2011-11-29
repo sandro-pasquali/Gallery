@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>	
+
+<title></title>
+
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="ROBOTS" content="ALL" />
+<meta name="Copyright" content="Copyright (c) Unified Applications Inc." />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="MSSmartTagsPreventParsing" content="true" />
+
+<style type="text/css">
+
+HTML
+  {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+  }
+
+BODY
+  {
+	  background-color: none;
+	  padding: 0px;
+	  margin: 0px;
+	  border: 0px;
+	}
+
+IMG
+  {
+    top: 0px;
+    left: 0px;
+  }
+  
+</style>
+
+<script type="text/javascript" src="FrameController.js"></script>
+<script type="text/javascript" src="general.js"></script>
+
+<script type="text/javascript">
+	
+function doReload()
+  {
+  	document.location.href = 'slideshow.html';
+  }	
+	
+function showPic(imID)
+  {
+  	try
+  	  {
+		  	var im = document.getElementById(imID);
+		  	var wSize = getWindowSize().width;
+		  	var imWidth = im.offsetWidth;
+		  	var imX = findPosX(im);
+		  	
+		  	var marg = parseInt((wSize-imWidth)/2);
+		  	
+		  	var newX = imX - marg;
+		  	
+		  	ScreenControl.moveTo(newX,0,50,"inout");	
+  	  }
+  	catch(e)
+  	  {}
+  }
+  
+function hidePanelNotes()
+  {
+  	return;
+  	var nP = document.getElementById('panelNotesOut');
+  	nP.style.visibility = 'hidden';
+  }  
+  
+function showPanelNotes(e)
+  {
+  	return;
+  	var ev = e || window.event;
+  	var targ = e ? ev.target : ev.srcElement;
+  	
+  	var imId = targ.getAttribute('id');
+  	
+  	var nP = document.getElementById('panelNotesOut');
+  	var notes = top.currentCollection[top.currentCollectionIndex]['images'][imId]['notes'];
+
+  	nP.style.visibility = 'visible';
+  	nP.style.left = (findPosX(targ) + 0).toString() + 'px';
+  	nP.style.top = (findPosY(targ) + 0).toString() + 'px';
+  	//nP.style.width = targ.offsetWidth;
+  	//nP.style.height = targ.offsetHeight;
+  	
+  	var nPT = document.createTextNode('sandro');
+  	
+  	try
+  	  {
+  	    nP.removeChild(nP.firstChild);
+  	  }
+  	catch(e){}
+  	
+  	nP.appendChild(nPT);
+  }
+	
+function createDockTargets()
+  {
+  	try
+  	  {
+		  	var im = null;
+		  	var tileOffset = 3000;
+		  	
+		  	var cc = top.currentCollection;
+		  	
+		  	var cnt = 0;
+		  	for(p in top.dockRef.imgPointers)
+				  {
+				  	var imId = top.dockRef.imgPointers[p].split('\/');
+				  	imId = imId[imId.length-1];
+				  	
+				  	var cont = document.createElement('div');
+				  	cont.setAttribute('id',imId);
+				  	cont.setAttribute('class','panel');
+				  	cont.style.position = 'absolute';
+				  	cont.style.left = ((cnt+1)*tileOffset).toString() + 'px';
+				  	
+		  	  	im = document.createElement('img');
+		  	  	
+		  	  	// cnt == array index of image in artistId.images
+		  	  	im.setAttribute('id',cnt);
+		  	  	
+		  	  	im.style.border = '6px #313131 solid';
+		  	  	im.setAttribute('originalW','0');
+		  	  	im.setAttribute('originalH','0');
+		  	  	
+		  	  	im.onmouseover = showPanelNotes;
+		  	  	im.onmouseout = hidePanelNotes;
+		  	  	
+		  	  	im.src = top.dockRef.imgPointers[p];
+		  	  	
+		  	  	var nim = cont.appendChild(im);
+		  	  	
+		  	  	var pan = document.body.appendChild(cont);
+		  	  	var pH = parseInt(pan.offsetHeight);
+		
+		  	    pan.style.top = '20px';//(Math.max((parseInt(getWindowSize().height) - pH)/2,0)).toString() + 'px';
+		
+		  	    document.getElementById('stretcher').style.width = ((cnt+2)*tileOffset).toString() + 'px';
+		  	    
+		  	    cnt++;
+		  	  }
+		  }
+		catch(e){}
+  }
+
+function adjustImageHeights()
+  {
+  	var ims = document.getElementsByTagName('img');
+  	var visHeight = getWindowSize().height;
+  	var visWidth = getWindowSize().width;
+  	
+  	for(x=0; x < ims.length; x++)
+  	  {
+  	  	var wPadding = 30; // min left/right padding on images
+
+        /*
+         * we want to always resize based on original
+         * image sizes (constant resizing will leave us with
+         * ever-more-distorted divisions and redivisions of resized
+         * image sizes).  so we check this attribute of
+         * the image element.  if not set, set it.
+         */
+        if(ims[x].getAttribute('originalW') == '0')
+          {
+						ims[x].setAttribute('originalW', ims[x].offsetWidth);
+						ims[x].setAttribute('originalH', ims[x].offsetHeight);
+					}
+					
+				var imHeight = ims[x].getAttribute('originalH');
+				var imWidth = ims[x].getAttribute('originalW');
+				
+  	  	var diff = imWidth/imHeight;
+  	  	
+  	  	var newW = (visHeight - 2*wPadding) * diff;
+  	  	var newH = (visHeight - 2*wPadding);
+					
+  	  	/*
+  	  	 * did the above adjustments make our image
+  	  	 * too WIDE for the screen? if so, recalc w/h
+  	  	 */
+  	  	
+  	  	var cWidth = (visWidth - 2*wPadding);
+  	  	if(newW > cWidth)
+  	  	  {
+  	  	  	diff = imHeight/imWidth;
+  	  	  	
+  	  	  	newW = cWidth;
+  	  	  	newH = cWidth * diff;
+  	  	  }
+  	  	
+  	  	ims[x].style.height = newH.toString() + 'px'; 
+        ims[x].style.width = newW.toString() + 'px';	
+      }
+  }
+
+</script>
+
+</head>
+<body onload="parent.registerSlider(this);">
+
+<div id="stretcher" style="width:10px; border:0px; margin:0px; padding:0px;">&nbsp;</div>
+
+<div id="panelNotesOut" style="position:absolute; top:0px; left:0px; width:200px; height:200px; color:#000000; background-color:#FFFFCE; border:1px #000000 solid; visibility:hidden; z-index:1000; padding:10px; font-family:Tahoma,Verdana,Arial; font-size:10px;"></div>
+
+</body>
+</html>

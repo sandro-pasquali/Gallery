@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>	
+
+<title></title>
+
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="ROBOTS" content="ALL" />
+<meta name="Copyright" content="Copyright (c) Unified Applications Inc." />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="MSSmartTagsPreventParsing" content="true" />
+
+<style type="text/css">
+	
+HTML
+  {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    width: 100%;
+    height: 100%;
+	}
+	
+BODY
+  {
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    background-color: #000000;
+  }
+	
+#nav
+  {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 0px;
+    z-index: 100;
+	}
+	
+#slideshow
+  {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 0px;
+    z-index: 200;
+    background-color: none;
+	}
+	
+#artists
+  {
+    font-size: 10px;
+    font-family: Tahoma, Verdana, Arial;
+    color: #ffffff;
+    padding-top: 8px;
+  }
+	
+</style>
+
+<script type="text/javascript" src="general.js"></script>
+<script type="text/javascript">
+	
+var lastShownImageId = null;
+var curMenuState = 'closed';
+	
+var slideshowFrame = null;	
+var navFrame = null;
+
+var currentCollection = null;
+
+var resizeTimer = null;
+
+/*
+ * set this to the artistId you want to start with
+ */
+var currentCollectionIndex = 1;
+
+var interfaceStarted = false;
+	
+function showPic(imId)
+  {
+  	imId = imId || lastShownImageId;
+  	if(imId)
+  	  {
+		  	lastShownImageId = imId;
+		  	slideshowFrame.showPic(imId);
+  	  }
+  }	
+	
+function sliderHeight()	
+  {
+  	return(parseInt(document.getElementById('slideshow').style.height));
+  }
+
+function navHeight()
+  {
+  	return(170);
+  }
+  
+function windowHeight()
+  {
+  	return(getWindowSize().height);
+  }
+	
+function handleResize()
+  {
+  	interfaceStarted = false;
+  	
+  	var _slid = document.getElementById('slideshow');
+  	var _nav = document.getElementById('nav');
+
+    _slid.style.height = (windowHeight() - navHeight()).toString() + 'px';
+    _nav.style.height = windowHeight().toString() + 'px';
+
+  	navFrame.set(windowHeight() - navHeight());
+  	
+  	try
+  	  {
+  	    slideshowFrame.adjustImageHeights();
+  	    setTimeout("showPic()",50);
+  	  }
+  	catch(e)
+  	  {
+  	  	setTimeout("slideshowFrame.adjustImageHeights();showPic();",1000);
+  	  }
+  	
+  	interfaceStarted = true;
+  }
+
+function getMenuState()
+  {
+  	return(curMenuState);
+  }
+  
+function toggleMenu(se)
+  {
+  	var textEl = se || navFrame.document.getElementById('menuControl');
+  	
+  	if(getMenuState() == 'open')
+  	  {
+  	  	closeMenu(textEl);
+  	  }
+  	else
+  		{
+  			openMenu(textEl);
+  		}
+  }
+
+function openMenu(se)
+  {
+  	var textEl = se || navFrame.document.getElementById('menuControl');
+  	
+  	var n = document.getElementById('nav');
+  	if(curMenuState == 'closed')
+  	  {
+		  	n.style.zIndex = '300';
+		  	navFrame.set(0);
+		  	curMenuState = 'open';
+		  	textEl.innerHTML = 'close menu -';
+		  }
+  }
+  
+function closeMenu(se)
+  {
+    var textEl = se || navFrame.document.getElementById('menuControl');
+    
+  	var n = document.getElementById('nav');
+  	if(curMenuState == 'open')
+  	  {
+		  	n.style.zIndex = '100';
+		  	handleResize();
+		  	curMenuState = 'closed';
+		  	textEl.innerHTML = 'open menu +';
+		  }
+  }
+
+function convertHTMLSpecialChars(str)
+  {
+    str = str.replace('&amp;','\&');
+    str = str.replace('&quot;','\"');
+    str = str.replace('&#039;','\'');
+    str = str.replace('&lt;','\<');
+    str = str.replace('&gt;','\>'); 	
+
+    return(str);
+  }
+
+function registerSlider(s)
+  {
+  	slideshowFrame = s;
+  	slideshowFrame.createDockTargets();
+  	
+  	setTimeout('handleResize()',1000);
+  }
+
+function registerNavLoad(frm)
+  {
+  	navFrame = frm;
+    handleResize();
+    
+    if(slideshowFrame)
+      {
+      	slideshowFrame.doReload();
+      }
+    else
+    	{
+  	    document.getElementById('slideshow').src = 'slideshow.html';
+  	  }
+  }	
+  
+window.onresize = handleResize;
+	
+</script>
+
+</head>
+
+<body>
+
+<iframe id="slideshow" name="slideshow" scrolling="no" allowTransparency="true" frameborder="no" src="about:blank"></iframe>
+<iframe id="nav" name="nav" scrolling="no" allowTransparency="true" frameborder="no" src="nav.php"></iframe>
+
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+BODY
+  {
+    background-color: #ffffff;  
+  }
+  
+IMG 
+  {
+    cursor: pointer;
+    cursor: hand;
+  }
+  
+.text
+  {
+    float: left;
+    margin-right: 10px;
+  }

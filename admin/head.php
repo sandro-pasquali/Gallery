@@ -1,0 +1,1 @@
+<a href="addArtist.php">Add an Artist</a> | <a href="editArtist.php">Edit artist info</a> | <a href="uploadPhotos.php">Upload Photos</a> | <a href="editPhotoInfo.php">Edit Photo Info</a> | <a href="showInfoInterface.php">add a show</a> | <a href="showInfoList.php">View shows</a><br /><br />
